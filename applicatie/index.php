@@ -1,19 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
-</head>
-<body>
-    <h1>It Works!</h1>
-    <?php echo('Hallo WT\'er, de webserver is online en PHP werkt.'); ?>
-    <br>
-    <br>
-    Alle technische informatie over je webserver vind je hier: <a href="phpinfo.php">http://<?=$_SERVER['HTTP_HOST']?>/phpinfo.php</a>
-    <br>
-    <br>
-    Een voorbeeld van een pagina die gegevens uit de database haalt vind je hier: <a href="componist-aantalstukken.php">http://<?=$_SERVER['HTTP_HOST']?>/componist-aantalstukken.php</a>
-</body>
-</html>
+<?php include 'includes/header.php'; ?>
+
+    <aside>
+      <h2>Menu opties</h2>
+
+      <ul>
+        <li><a href="#pizza">Pizza's</a></li>
+        <li><a href="#pasta">Pasta's</a></li>
+        <li><a href="#dranken">Dranken</a></li>
+        <li><a href="#desserts">Desserts</a></li>
+      </ul>
+    </aside>
+    
+    <main>
+      <h1>Welkom bij Pizzeria Sole Machina</h1>
+
+      <section id="pizza">
+        <h2>Pizza's</h2>
+
+        <article class="menu-item">
+          <h3>Pizza Hawaii</h3>
+          <p>€12,95</p>
+
+          <form action="#" method="post" class="amount-control">
+            <input type="hidden" name="product" value="pizza-hawaii">
+
+            <label for="pizza-hawaii-amount">Aantal</label>
+
+            <button type="button">−</button>
+            <input type="number" id="pizza-hawaii-amount" name="amount" min="0" value="0">
+            <button type="button">+</button>
+
+            <button type="submit">Toevoegen</button>
+          </form>
+        </article>
+
+        <article class="menu-item">
+          <h3>Pizza Margherita</h3>
+          <p>€12,95</p>
+
+          <form action="#" method="post" class="amount-control">
+            <input type="hidden" name="product" value="pizza-margherita">
+
+            <label for="pizza-margherita-amount">Aantal</label>
+
+            <button type="button">−</button>
+            <input type="number" id="pizza-margherita-amount" name="amount" min="0" value="0">
+            <button type="button">+</button>
+
+            <button type="submit">Toevoegen</button>
+          </form>
+        </article>
+      </section>
+
+      <section id="pasta">
+        <h2>Pasta's</h2>
+
+        <article class="menu-item">
+          <h3>Pasta Carbonara</h3>
+          <p>€12,95</p>
+
+          <form action="#" method="post" class="amount-control">
+            <input type="hidden" name="product" value="pasta-carbonara">
+
+            <label for="pasta-carbonara-amount">Aantal</label>
+
+            <button type="button">−</button>
+            <input type="number" id="pasta-carbonara-amount" name="amount" min="0" value="0">
+            <button type="button">+</button>
+
+            <button type="submit">Toevoegen</button>
+          </form>
+        </article>
+      </section>
+
+      <section id="dranken">
+        <h2>Dranken</h2>
+
+        <article class="menu-item">
+          <h3>Coca-Cola</h3>
+          <p>€2,50</p>
+
+          <form action="#" method="post" class="amount-control">
+            <input type="hidden" name="product" value="coca-cola">
+
+            <label for="coca-cola-amount">Aantal</label>
+
+            <button type="button">−</button>
+            <input type="number" id="coca-cola-amount" name="amount" min="0" value="0">
+            <button type="button">+</button>
+
+            <button type="submit">Toevoegen</button>
+          </form>
+        </article>
+      </section>
+
+      <section id="desserts">
+        <h2>Desserts</h2>
+      </section>
+    </main>
+    
+<?php include 'includes/footer.php'; ?>
