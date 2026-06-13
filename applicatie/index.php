@@ -1,102 +1,88 @@
-<?php include 'includes/header.php'; ?>
+<?php 
+  require_once __DIR__ . '/includes/session.php';
+  require_once __DIR__ . '/database_connection.php';
+  require_once __DIR__ . '/includes/functions.php';
+
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    addToBasket(
+        $_POST['product'],
+        (int)$_POST['amount']
+    );
+  }
+
+
+  $db = maakverbinding();
+
+  $productQuery = "SELECT name, price, type_id FROM Product";
+  $productStmt = $db->prepare($productQuery);
+  $productStmt->execute();
+  $products = $productStmt->fetchAll(PDO::FETCH_ASSOC);
+  
+  $productTypeQuery = "SELECT name FROM ProductType";
+  $productTypeStmt = $db->prepare($productTypeQuery);
+  $productTypeStmt->execute();
+  $productTypes = $productTypeStmt->fetchAll(PDO::FETCH_ASSOC);
+
+  require 'includes/header.php'; 
+?>
 
     <aside>
       <h2>Menu opties</h2>
 
       <ul>
-        <li><a href="#pizza">Pizza's</a></li>
-        <li><a href="#pasta">Pasta's</a></li>
-        <li><a href="#dranken">Dranken</a></li>
-        <li><a href="#desserts">Desserts</a></li>
+        <?php foreach ($productTypes as $productType): ?>
+          <?php $sectionId = strtolower($productType['name']); ?>
+
+          <li>
+            <a href="#<?= htmlspecialchars($sectionId) ?>">
+              <?= htmlspecialchars($productType['name']) ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
       </ul>
     </aside>
     
     <main>
-      <h1>Welkom bij Pizzeria Sole Machina</h1>
+    <h1>Welkom bij Pizzeria Sole Machina</h1>
 
-      <section id="pizza">
-        <h2>Pizza's</h2>
+    <?php foreach ($productTypes as $productType): ?>
+        <?php $sectionId = strtolower($productType['name']); ?>
 
-        <article class="menu-item">
-          <h3>Pizza Hawaii</h3>
-          <p>€12,95</p>
+        <section id="<?= htmlspecialchars($sectionId) ?>">
+            <h2><?= htmlspecialchars($productType['name']) ?></h2>
 
-          <form action="#" method="post" class="amount-control">
-            <input type="hidden" name="product" value="pizza-hawaii">
+            <?php foreach ($products as $product): ?>
+                <?php if ($product['type_id'] === $productType['name']): ?>
+                    <article class="menu-item">
+                        <h3><?= htmlspecialchars($product['name']) ?></h3>
+                        <p>€<?= number_format($product['price'], 2, ',', '.') ?></p>
 
-            <label for="pizza-hawaii-amount">Aantal</label>
+                        <form action="#" method="post" class="amount-control">
+                            <input 
+                                type="hidden" 
+                                name="product" 
+                                value="<?= htmlspecialchars($product['name']) ?>"
+                            >
 
-            <button type="button">−</button>
-            <input type="number" id="pizza-hawaii-amount" name="amount" min="0" value="0">
-            <button type="button">+</button>
+                            <label for="<?= htmlspecialchars($product['name']) ?>-amount">
+                                Aantal
+                            </label>
 
-            <button type="submit">Toevoegen</button>
-          </form>
-        </article>
+                            <input 
+                                type="number" 
+                                id="<?= htmlspecialchars($product['name']) ?>-amount"
+                                name="amount" 
+                                min="1" 
+                                value="1"
+                            >
 
-        <article class="menu-item">
-          <h3>Pizza Margherita</h3>
-          <p>€12,95</p>
-
-          <form action="#" method="post" class="amount-control">
-            <input type="hidden" name="product" value="pizza-margherita">
-
-            <label for="pizza-margherita-amount">Aantal</label>
-
-            <button type="button">−</button>
-            <input type="number" id="pizza-margherita-amount" name="amount" min="0" value="0">
-            <button type="button">+</button>
-
-            <button type="submit">Toevoegen</button>
-          </form>
-        </article>
-      </section>
-
-      <section id="pasta">
-        <h2>Pasta's</h2>
-
-        <article class="menu-item">
-          <h3>Pasta Carbonara</h3>
-          <p>€12,95</p>
-
-          <form action="#" method="post" class="amount-control">
-            <input type="hidden" name="product" value="pasta-carbonara">
-
-            <label for="pasta-carbonara-amount">Aantal</label>
-
-            <button type="button">−</button>
-            <input type="number" id="pasta-carbonara-amount" name="amount" min="0" value="0">
-            <button type="button">+</button>
-
-            <button type="submit">Toevoegen</button>
-          </form>
-        </article>
-      </section>
-
-      <section id="dranken">
-        <h2>Dranken</h2>
-
-        <article class="menu-item">
-          <h3>Coca-Cola</h3>
-          <p>€2,50</p>
-
-          <form action="#" method="post" class="amount-control">
-            <input type="hidden" name="product" value="coca-cola">
-
-            <label for="coca-cola-amount">Aantal</label>
-
-            <button type="button">−</button>
-            <input type="number" id="coca-cola-amount" name="amount" min="0" value="0">
-            <button type="button">+</button>
-
-            <button type="submit">Toevoegen</button>
-          </form>
-        </article>
-      </section>
-
-      <section id="desserts">
-        <h2>Desserts</h2>
-      </section>
-    </main>
+                            <button type="submit">Toevoegen</button>
+                        </form>
+                    </article>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </section>
+    <?php endforeach; ?>
+</main>
     
 <?php include 'includes/footer.php'; ?>

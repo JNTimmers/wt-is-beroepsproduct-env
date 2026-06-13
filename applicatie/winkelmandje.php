@@ -1,59 +1,110 @@
-<?php include 'includes/header.php'; ?>
+<?php
+require_once 'includes/session.php';
+require_once 'database_connection.php';
+require_once 'includes/functions.php';
 
-    <main>
-        <h1>Welkom bij het winkelmandje van Pizzeria Sole Machina</h1>
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['update'])) {
+        foreach ($_POST['product'] as $index => $productName) {
+            $amount = (int) $_POST['amount'][$index];
+            updateBasket($productName, $amount);
+        }
+    }
 
-        <form action="#" method="post">
-          <section>
+    if (isset($_POST['remove'])) {
+        removeFromBasket($_POST['remove']);
+    }
+}
+
+$db = maakverbinding();
+
+$basket = $_SESSION['basket'] ?? [];
+
+$products = [];
+$subtotal = 0;
+$deliveryCosts = 3.50;
+
+if (!empty($basket)) {
+    $productNames = array_keys($basket);
+
+    $placeholders = implode(',', array_fill(0, count($productNames), '?'));
+
+    $productQuery = "SELECT name, price FROM Product WHERE name IN ($placeholders)";
+    $productStmt = $db->prepare($productQuery);
+    $productStmt->execute($productNames);
+
+    $products = $productStmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+require 'includes/header.php';
+?>
+
+
+<main>
+    <h1>Welkom bij het winkelmandje van Pizzeria Sole Machina</h1>
+
+    <form action="#" method="post">
+        <section>
             <h2>Winkelmandje</h2>
 
-            <article class="menu-item">
-                <h3>Pizza Hawaii</h3>
-                <p>€12,95</p>
+            <?php if (empty($products)): ?>
+                <p>Je winkelmandje is leeg.</p>
+            <?php else: ?>
+                <?php foreach ($products as $product): ?>
+                    <?php
+                        $amount = $basket[$product['name']]['amount'];
+                        $lineTotal = $product['price'] * $amount;
+                        $subtotal += $lineTotal;
 
-                <input type="hidden" name="product[]" value="pizza-hawaii">
+                        $inputId = strtolower(str_replace(' ', '-', $product['name'])) . '-amount';
+                    ?>
 
-                <label for="pizza-hawaii-amount">Aantal</label>
+                    <article class="menu-item">
+                        <h3><?= htmlspecialchars($product['name']) ?></h3>
 
-                <div class="amount-control">
-                <button type="button">−</button>
-                <input type="number" id="pizza-hawaii-amount" name="amount[]" min="0" value="1">
-                <button type="button">+</button>
-                </div>
+                        <p>
+                            €<?= number_format($product['price'], 2, ',', '.') ?>
+                        </p>
 
-                <button type="button">Verwijderen</button>
-            </article>
+                        <input 
+                            type="hidden" 
+                            name="product[]" 
+                            value="<?= htmlspecialchars($product['name']) ?>"
+                        >
 
-            <article class="menu-item">
-                <h3>Pizza Margherita</h3>
-                <p>€12,95</p>
+                        <label for="<?= htmlspecialchars($inputId) ?>">Aantal</label>
 
-                <input type="hidden" name="product[]" value="pizza-margherita">
+                        <input 
+                            type="number" 
+                            id="<?= htmlspecialchars($inputId) ?>" 
+                            name="amount[]" 
+                            min="0" 
+                            value="<?= htmlspecialchars($amount) ?>"
+                        >
+                        <button type="submit" name="update">Aantallen bijwerken</button>
 
-                <label for="pizza-margherita-amount">Aantal</label>
+                        <p>
+                            Totaal: €<?= number_format($lineTotal, 2, ',', '.') ?>
+                        </p>
 
-                <div class="amount-control">
-                <button type="button">−</button>
-                <input type="number" id="pizza-margherita-amount" name="amount[]" min="0" value="2">
-                <button type="button">+</button>
-                </div>
+                        <button type="submit" name="remove" value="<?= htmlspecialchars($product['name']) ?>">
+                            Verwijderen
+                        </button>
+                    </article>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </section>
 
-                <button type="button">Verwijderen</button>
-            </article>
-            </section>
-
-            <section>
-            
-
+        <section>
             <fieldset>
-                <h2>Verzendgegevens</h2>
-                
+                <legend>Verzendgegevens</legend>
+
                 <input type="radio" id="delivery" name="delivery-method" value="delivery" checked>
                 <label for="delivery">Bezorgen</label>
 
                 <input type="radio" id="pickup" name="delivery-method" value="pickup">
                 <label for="pickup">Ophalen</label><br>
-                
+
                 <label for="name">Naam:</label>
                 <input type="text" id="name" name="name">
 
@@ -68,30 +119,29 @@
                     <input type="text" id="city" name="city">
                 </section>
             </fieldset>
-            </section>
+        </section>
 
-            <section class="details">
-              <h2>Bestellingsoverzicht</h2>
+        <?php
+            $total = $subtotal + $deliveryCosts;
+        ?>
 
-              <dl>
-                  <dt>Subtotaal</dt>
-                  <dd>€38,85</dd>
+        <section class="details">
+            <h2>Bestellingsoverzicht</h2>
 
-                  <dt>Bezorgkosten</dt>
-                  <dd>€3,50</dd>
+            <dl>
+                <dt>Subtotaal</dt>
+                <dd>€<?= number_format($subtotal, 2, ',', '.') ?></dd>
 
-                  <dt>Totaal</dt>
-                  <dd><strong>€42,35</strong></dd>
-              </dl>
+                <dt>Bezorgkosten</dt>
+                <dd>€<?= number_format($deliveryCosts, 2, ',', '.') ?></dd>
 
-              <button type="submit">Bestelling plaatsen</button>
-          </section>
-        </form>
-    </main>
+                <dt>Totaal</dt>
+                <dd><strong>€<?= number_format($total, 2, ',', '.') ?></strong></dd>
+            </dl>
 
-    <footer>
-      <p>&copy; 2026 Pizzeria Sole Machina. Alle rechten voorbehouden.</p>
-      <p><a href="privacy-policy.html">Privacy Policy</a></p>
-    </footer>
-  </body>
-</html>
+            <button type="submit">Bestelling plaatsen</button>
+        </section>
+    </form>
+</main>
+
+<?php require 'includes/footer.php'; ?>
