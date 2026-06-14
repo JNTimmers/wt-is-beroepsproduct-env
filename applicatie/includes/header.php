@@ -1,3 +1,7 @@
+<?php
+ Require_once __DIR__ . '/session.php';
+ ?>
+
 <!DOCTYPE html>
 <html lang="nl">
 
@@ -16,14 +20,21 @@
 
         <ul class="nav-links">
           <li><a href="index.php">Menu</a></li>
+          <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'Client'): ?>
           <li><a href="profiel.php">Profiel</a></li>
-          <li><a href="bestellingoverzicht.php">Bestellingen</a></li>
-          <li><a href="details.php">Details</a></li>
+          <?php endif; ?>
+          <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'Personnel'): ?>
+            <li><a href="bestellingoverzicht.php">Bestellingen</a></li>
+          <?php endif; ?>
         </ul>
 
         <div class="nav-actions">
           <a href="winkelmandje.php" class="nav-button">Winkelmandje</a>
-          <a href="login.php" class="nav-button">Login</a>
+          <?php if (isset($_SESSION['user'])): ?>
+            <a href="logout.php" class="nav-button">Logout</a>
+          <?php else: ?>
+            <a href="login.php" class="nav-button">Login</a>
+          <?php endif; ?>
         </div>
       
       </nav>

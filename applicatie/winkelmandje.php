@@ -1,6 +1,6 @@
 <?php
 require_once 'includes/session.php';
-require_once 'database_connection.php';
+require_once 'database-connection.php';
 require_once 'includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -43,7 +43,7 @@ require 'includes/header.php';
 <main>
     <h1>Welkom bij het winkelmandje van Pizzeria Sole Machina</h1>
 
-    <form action="#" method="post">
+    <form action="winkelmandje.php" method="post">
         <section>
             <h2>Winkelmandje</h2>
 
@@ -106,17 +106,20 @@ require 'includes/header.php';
                 <label for="pickup">Ophalen</label><br>
 
                 <label for="name">Naam:</label>
-                <input type="text" id="name" name="name">
+                <?php if (isset($_SESSION['user'])): ?>
+                    <input type="text" id="name" name="name" value="<?= htmlspecialchars($_SESSION['user']['first_name'] . ' ' . $_SESSION['user']['last_name']) ?>">
+                <?php else: ?>
+                    <input type="text" id="name" name="name">
+                <?php endif; ?>
 
                 <section id="address-fields">
                     <label for="address">Adres:</label>
-                    <input type="text" id="address" name="address">
+                    <?php if (isset($_SESSION['user'])): ?>
+                        <input type="text" id="address" name="address" value="<?= htmlspecialchars($_SESSION['user']['address']) ?>">
+                    <?php else: ?>
+                        <input type="text" id="address" name="address">
+                    <?php endif; ?>
 
-                    <label for="postal-code">Postcode:</label>
-                    <input type="text" id="postal-code" name="postal-code">
-
-                    <label for="city">Plaats:</label>
-                    <input type="text" id="city" name="city">
                 </section>
             </fieldset>
         </section>
@@ -132,14 +135,14 @@ require 'includes/header.php';
                 <dt>Subtotaal</dt>
                 <dd>€<?= number_format($subtotal, 2, ',', '.') ?></dd>
 
-                <dt>Bezorgkosten</dt>
-                <dd>€<?= number_format($deliveryCosts, 2, ',', '.') ?></dd>
+                <dt class="ShippingCosts">Bezorgkosten</dt>
+                <dd class="ShippingCosts">€<?= number_format($deliveryCosts, 2, ',', '.') ?></dd>
 
                 <dt>Totaal</dt>
                 <dd><strong>€<?= number_format($total, 2, ',', '.') ?></strong></dd>
             </dl>
 
-            <button type="submit">Bestelling plaatsen</button>
+            <button type="submit" name="place-order" formaction="place-order.php">Bestelling plaatsen</button>
         </section>
     </form>
 </main>

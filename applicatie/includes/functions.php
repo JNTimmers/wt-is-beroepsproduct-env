@@ -41,7 +41,7 @@ function isLoggedIn(): bool
 
 function isPersonnel(): bool
 {
-    return isLoggedIn() && $_SESSION['user']['role'] === 'personnel';
+    return isLoggedIn() && $_SESSION['user']['role'] === 'Personnel';
 }
 
 function logout(): void

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/session.php';
-require_once __DIR__ . '/database_connection.php';
+require_once __DIR__ . '/database-connection.php';
 
 $error = null;
 
@@ -12,17 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = trim($_POST['voornaam']);
     $lastName = trim($_POST['achternaam']);
 
-    $adress = trim($_POST['straat']) . ' ' .
-              trim($_POST['huisnummer']) . ', ' .
-              trim($_POST['postcode']) . ' ' .
-              trim($_POST['plaats']);
+    $address = trim($_POST['straat']) . ' ' .
+               trim($_POST['huisnummer']) . ', ' .
+               trim($_POST['postcode']) . ' ' .
+               trim($_POST['plaats']);
 
     if ($password !== $confirmPassword) {
         $error = 'De wachtwoorden komen niet overeen.';
     } else {
       $db = maakverbinding();
 
-      $checkQuery = "SELECT username FROM User WHERE username = ?";
+      $checkQuery = "SELECT username FROM UserAccount WHERE username = ?";
       $checkStmt = $db->prepare($checkQuery);
       $checkStmt->execute([$username]);
 
@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       } else {
           $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-          $query = "INSERT INTO User
-                    (username, password, first_name, last_name, adress, role)
+          $query = "INSERT INTO UserAccount
+                    (username, password, first_name, last_name, address, role)
                     VALUES (?, ?, ?, ?, ?, ?)";
 
           $stmt = $db->prepare($query);
@@ -41,8 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               $passwordHash,
               $firstName,
               $lastName,
-              $adress,
-              'client'
+              $address,
+              'Client'
           ]);
 
           header('Location: login.php');

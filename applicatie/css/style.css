@@ -297,6 +297,10 @@ a:hover {
   display: none;
 }
 
+form:has(#pickup:checked) .ShippingCosts {
+    display: none;
+}
+
 form.account-form {
     display: flex;
     flex-direction: column;

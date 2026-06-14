@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/session.php';
 require_once __DIR__ . '/includes/functions.php';
-require_once __DIR__ . '/database_connection.php';
+require_once __DIR__ . '/database-connection.php';
 
 $error = null;
 
@@ -11,8 +11,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $db = maakverbinding();
 
-    $query = "SELECT username, password, first_name, last_name, adress, role
-              FROM User
+    $query = "SELECT username, password, first_name, last_name, address, role
+              FROM UserAccount
               WHERE username = ?";
 
     $stmt = $db->prepare($query);
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'username' => $user['username'],
         'first_name' => $user['first_name'],
         'last_name' => $user['last_name'],
-        'adress' => $user['adress'],
+        'address' => $user['address'],
         'role' => $user['role']
     ];
 
@@ -56,7 +56,7 @@ require __DIR__ . '/includes/header.php';
 
         <button type="submit">Inloggen</button>
 
-        <a href="registreren.php" id="register-button" class="nav-button">
+        <a href="registreer.php" id="register-button" class="nav-button">
             Nog geen account? Registreer hier
         </a>
     </form>

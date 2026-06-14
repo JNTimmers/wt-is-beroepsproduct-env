@@ -1,6 +1,6 @@
 <?php 
   require 'includes/header.php'; 
-  require_once 'database_connection.php';
+  require_once 'database-connection.php';
 ?>
 
     <aside>
