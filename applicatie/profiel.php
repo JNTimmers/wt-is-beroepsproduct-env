@@ -1,4 +1,7 @@
-<?php include 'includes/header.php'; ?>
+<?php 
+  require 'includes/header.php'; 
+  require_once 'database_connection.php';
+?>
 
     <main>
     <h1>Mijn profiel</h1>
@@ -58,9 +61,4 @@
         </article>
     </section>
 </main>
-    <footer>
-      <p>&copy; 2026 Pizzeria Sole Machina. Alle rechten voorbehouden.</p>
-      <p><a href="privacy-policy.html">Privacy Policy</a></p>
-    </footer>
-  </body>
-</html>
+<?php require 'includes/footer.php'; ?>

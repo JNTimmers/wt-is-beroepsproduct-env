@@ -34,3 +34,17 @@ function clearBasket(): void
     $_SESSION['basket'] = [];
 }
 
+function isLoggedIn(): bool
+{
+    return $_SESSION['user'] !== null;
+}
+
+function isPersonnel(): bool
+{
+    return isLoggedIn() && $_SESSION['user']['role'] === 'personnel';
+}
+
+function logout(): void
+{
+    $_SESSION['user'] = null;
+}

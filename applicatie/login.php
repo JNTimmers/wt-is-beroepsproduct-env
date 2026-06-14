@@ -1,27 +1,65 @@
-<?php include 'includes/header.php'; ?>
+<?php
+require_once __DIR__ . '/includes/session.php';
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/database_connection.php';
 
-    <main>
-      <h1>Login</h1>
-      
-        <form class="account-form">
-            <label for="email">E-mailadres</label>
-            <input type="email" id="email" name="email" required>
-    
-            <label for="wachtwoord">Wachtwoord</label>
-            <input type="password" id="wachtwoord" name="wachtwoord" required>
-    
-            <button type="submit">Inloggen</button>
-            <!-- vraag docent: Registratielink staat binnen het form voor de opmaak.
-            Is het beter om deze buiten het form te plaatsen? -->
-            <a href="registreer.html" id="register-button" class="nav-button"> Nog geen account? Registreer hier</a> 
-        </form>
+$error = null;
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = trim($_POST['username']);
+    $password = $_POST['wachtwoord'];
 
-      
-    </main>
-    <footer>
-      <p>&copy; 2026 Pizzeria Sole Machina. Alle rechten voorbehouden.</p>
-      <p><a href="privacy-policy.html">Privacy Policy</a></p>
-    </footer>
-  </body>
-</html>
+    $db = maakverbinding();
+
+    $query = "SELECT username, password, first_name, last_name, adress, role
+              FROM User
+              WHERE username = ?";
+
+    $stmt = $db->prepare($query);
+    $stmt->execute([$username]);
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+      $_SESSION['user'] = [
+        'username' => $user['username'],
+        'first_name' => $user['first_name'],
+        'last_name' => $user['last_name'],
+        'adress' => $user['adress'],
+        'role' => $user['role']
+    ];
+
+    header('Location: index.php');
+    exit;
+
+    } else {
+        $error = 'Ongeldige gebruikersnaam of wachtwoord.';
+    }
+}
+
+require __DIR__ . '/includes/header.php';
+?>
+
+<main>
+    <h1>Login</h1>
+
+    <?php if ($error !== null): ?>
+        <p class="error-message"><?= htmlspecialchars($error) ?></p>
+    <?php endif; ?>
+
+    <form class="account-form" method="post">
+        <label for="username">Gebruikersnaam</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="wachtwoord">Wachtwoord</label>
+        <input type="password" id="wachtwoord" name="wachtwoord" required>
+
+        <button type="submit">Inloggen</button>
+
+        <a href="registreren.php" id="register-button" class="nav-button">
+            Nog geen account? Registreer hier
+        </a>
+    </form>
+</main>
+
+<?php require __DIR__ . '/includes/footer.php'; ?>

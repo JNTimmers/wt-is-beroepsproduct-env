@@ -1,4 +1,7 @@
-<?php include 'includes/header.php'; ?>
+<?php 
+  require 'includes/header.php'; 
+  require_once 'database_connection.php';
+?>
 
     <aside>
         <h2 id="filter-heading">Filters</h2>
@@ -39,7 +42,7 @@
 
     <article class="order">
         <header>
-            <h3>Bestelling #1024</h3>
+            <h2>Bestelling #1024</h2>
         </header>
 
             <dl>
@@ -79,7 +82,47 @@
     </article>
     <article class="order">
         <header>
-            <h3>Bestelling #1024</h3>
+            <h2>Bestelling #1024</h2>
+        </header>
+
+            <dl>
+                <dt>Datum</dt>
+                <dd>6 juni 2026</dd>
+
+                <dt>Klant</dt>
+                <dd>Jan Jansen</dd>
+
+                <dt>adres</dt>
+                <dd>Hoofdstraat 123, Druten</dd>
+
+                <dt>Totaal</dt>
+                <dd>€24,90</dd>
+
+                <dt>Status</dt>
+                <dd>
+                    <form action="update-status.php" method="post">
+                        <input type="hidden" name="order_id" value="1024">
+
+                        <select class="status-select" name="status">
+                            <option value="nieuw" selected>Nieuw</option>
+                            <option value="in-behandeling">In behandeling</option>
+                            <option value="onderweg">Onderweg</option>
+                            <option value="voltooid">Voltooid</option>
+                            <option value="geannuleerd">Geannuleerd</option>
+                        </select>
+
+                        <button type="submit">Opslaan</button>
+                    </form>
+                </dd>
+            </dl>
+
+        <a href="details.html" class="button">
+            Bekijk bestelling
+        </a>
+    </article>      
+    <article class="order">
+        <header>
+            <h2>Bestelling #1024</h2>
         </header>
 
             <dl>
@@ -119,47 +162,7 @@
     </article>
     <article class="order">
         <header>
-            <h3>Bestelling #1024</h3>
-        </header>
-
-            <dl>
-                <dt>Datum</dt>
-                <dd>6 juni 2026</dd>
-
-                <dt>Klant</dt>
-                <dd>Jan Jansen</dd>
-
-                <dt>adres</dt>
-                <dd>Hoofdstraat 123, Druten</dd>
-
-                <dt>Totaal</dt>
-                <dd>€24,90</dd>
-
-                <dt>Status</dt>
-                <dd>
-                    <form action="update-status.php" method="post">
-                        <input type="hidden" name="order_id" value="1024">
-
-                        <select class="status-select" name="status">
-                            <option value="nieuw" selected>Nieuw</option>
-                            <option value="in-behandeling">In behandeling</option>
-                            <option value="onderweg">Onderweg</option>
-                            <option value="voltooid">Voltooid</option>
-                            <option value="geannuleerd">Geannuleerd</option>
-                        </select>
-
-                        <button type="submit">Opslaan</button>
-                    </form>
-                </dd>
-            </dl>
-
-        <a href="details.html" class="button">
-            Bekijk bestelling
-        </a>
-    </article>
-    <article class="order">
-        <header>
-            <h3>Bestelling #1024</h3>
+            <h2>Bestelling #1024</h2>
         </header>
 
             <dl>
@@ -201,4 +204,4 @@
 
   </section>
 </main>
-<?php include 'includes/footer.php'; ?>
+<?php require 'includes/footer.php'; ?>
