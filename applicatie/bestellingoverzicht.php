@@ -1,6 +1,60 @@
 <?php 
-  require 'includes/header.php'; 
-  require_once 'database-connection.php';
+    require_once 'includes/session.php';
+    require_once 'database-connection.php';
+    require_once 'includes/functions.php';
+
+    if (!isPersonnel()) {
+        header('Location: index.php');
+        exit;
+    }
+
+    $db = maakverbinding();
+
+    $startDate = $_GET['startdatum'] ?? '';
+    $endDate = $_GET['einddatum'] ?? '';
+    $status = $_GET['status'] ?? '';
+
+    $query = "
+        SELECT 
+            po.order_id,
+            po.client_name,
+            po.address,
+            po.datetime,
+            po.status,
+            SUM(pop.quantity * p.price) AS total
+        FROM Pizza_Order po
+        JOIN Pizza_Order_Product pop ON po.order_id = pop.order_id
+        JOIN Product p ON pop.product_name = p.name
+        WHERE 1 = 1
+    ";
+
+    $params = [];
+
+    if ($startDate !== '') {
+        $query .= " AND CAST(po.datetime AS date) >= ?";
+        $params[] = $startDate;
+    }
+
+    if ($endDate !== '') {
+        $query .= " AND CAST(po.datetime AS date) <= ?";
+        $params[] = $endDate;
+    }
+
+    if ($status !== '') {
+        $query .= " AND po.status = ?";
+        $params[] = $status;
+    }
+
+    $query .= "
+        GROUP BY po.order_id, po.client_name, po.address, po.datetime, po.status
+        ORDER BY po.datetime DESC
+    ";
+
+    $stmt = $db->prepare($query);
+    $stmt->execute($params);
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    require 'includes/header.php';
 ?>
 
     <aside>
@@ -22,17 +76,17 @@
 
             <label for="status">Status</label>
             <select id="status" name="status">
-            <option value="">Alle statussen</option>
-            <option value="nieuw">Nieuw</option>
-            <option value="in-behandeling">In behandeling</option>
-            <option value="onderweg">Onderweg</option>
-            <option value="voltooid">Voltooid</option>
-            <option value="geannuleerd">Geannuleerd</option>
+                <option value="">Alle statussen</option>
+                <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Nieuw</option>
+                <option value="2" <?= $status === '2' ? 'selected' : '' ?>>In behandeling</option>
+                <option value="3" <?= $status === '3' ? 'selected' : '' ?>>Onderweg</option>
+                <option value="4" <?= $status === '4' ? 'selected' : '' ?>>Voltooid</option>
+                <option value="5" <?= $status === '5' ? 'selected' : '' ?>>Geannuleerd</option>
             </select>
         </fieldset>
 
         <button type="submit" class="aside-button">Filters toepassen</button>
-        <button type="reset" class="aside-button">Filters wissen</button>
+        <a href="bestellingoverzicht.php" class="aside-button">Filters wissen</a>
         </form>
   </aside>
 
@@ -40,166 +94,54 @@
   <section>
     <h1>Overzicht van bestellingen</h1>
 
-    <article class="order">
-        <header>
-            <h2>Bestelling #1024</h2>
-        </header>
+    <?php if (empty($orders)): ?>
+    <p>Er zijn geen bestellingen gevonden.</p>
+    <?php else: ?>
+        <?php foreach ($orders as $order): ?>
+            <article class="order">
+                <header>
+                    <h2>Bestelling #<?= htmlspecialchars($order['order_id']) ?></h2>
+                </header>
 
-            <dl>
-                <dt>Datum</dt>
-                <dd>6 juni 2026</dd>
+                <dl>
+                    <dt>Datum</dt>
+                    <dd><?= htmlspecialchars($order['datetime']) ?></dd>
 
-                <dt>Klant</dt>
-                <dd>Jan Jansen</dd>
+                    <dt>Klant</dt>
+                    <dd><?= htmlspecialchars($order['client_name']) ?></dd>
 
-                <dt>adres</dt>
-                <dd>Hoofdstraat 123, Druten</dd>
+                    <dt>Adres</dt>
+                    <dd><?= htmlspecialchars($order['address']) ?></dd>
 
-                <dt>Totaal</dt>
-                <dd>€24,90</dd>
+                    <dt>Totaal</dt>
+                    <dd>€<?= number_format($order['total'], 2, ',', '.') ?></dd>
 
-                <dt>Status</dt>
-                <dd>
-                    <form action="update-status.php" method="post">
-                        <input type="hidden" name="order_id" value="1024">
+                    <dt>Status</dt>
+                    <dd>
+                        <form action="update-status.php" method="post">
+                            <input 
+                                type="hidden" 
+                                name="order_id" 
+                                value="<?= htmlspecialchars($order['order_id']) ?>"
+                            >
 
-                        <select class="status-select" name="status">
-                            <option value="nieuw" selected>Nieuw</option>
-                            <option value="in-behandeling">In behandeling</option>
-                            <option value="onderweg">Onderweg</option>
-                            <option value="voltooid">Voltooid</option>
-                            <option value="geannuleerd">Geannuleerd</option>
-                        </select>
+                            <select class="status-select" name="status">
+                                <option value="1" <?= $order['status'] == 1 ? 'selected' : '' ?>>Nieuw</option>
+                                <option value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>In behandeling</option>
+                                <option value="3" <?= $order['status'] == 3 ? 'selected' : '' ?>>Onderweg</option>
+                                <option value="4" <?= $order['status'] == 4 ? 'selected' : '' ?>>Voltooid</option>
+                                <option value="5" <?= $order['status'] == 5 ? 'selected' : '' ?>>Geannuleerd</option>
+                            </select>
 
-                        <button type="submit">Opslaan</button>
-                    </form>
-                </dd>
-            </dl>
+                            <button type="submit">Opslaan</button>
+                        </form>
+                    </dd>
+                </dl>
 
-        <a href="details.html" class="button">
-            Bekijk bestelling
-        </a>
-    </article>
-    <article class="order">
-        <header>
-            <h2>Bestelling #1024</h2>
-        </header>
-
-            <dl>
-                <dt>Datum</dt>
-                <dd>6 juni 2026</dd>
-
-                <dt>Klant</dt>
-                <dd>Jan Jansen</dd>
-
-                <dt>adres</dt>
-                <dd>Hoofdstraat 123, Druten</dd>
-
-                <dt>Totaal</dt>
-                <dd>€24,90</dd>
-
-                <dt>Status</dt>
-                <dd>
-                    <form action="update-status.php" method="post">
-                        <input type="hidden" name="order_id" value="1024">
-
-                        <select class="status-select" name="status">
-                            <option value="nieuw" selected>Nieuw</option>
-                            <option value="in-behandeling">In behandeling</option>
-                            <option value="onderweg">Onderweg</option>
-                            <option value="voltooid">Voltooid</option>
-                            <option value="geannuleerd">Geannuleerd</option>
-                        </select>
-
-                        <button type="submit">Opslaan</button>
-                    </form>
-                </dd>
-            </dl>
-
-        <a href="details.html" class="button">
-            Bekijk bestelling
-        </a>
-    </article>      
-    <article class="order">
-        <header>
-            <h2>Bestelling #1024</h2>
-        </header>
-
-            <dl>
-                <dt>Datum</dt>
-                <dd>6 juni 2026</dd>
-
-                <dt>Klant</dt>
-                <dd>Jan Jansen</dd>
-
-                <dt>adres</dt>
-                <dd>Hoofdstraat 123, Druten</dd>
-
-                <dt>Totaal</dt>
-                <dd>€24,90</dd>
-
-                <dt>Status</dt>
-                <dd>
-                    <form action="update-status.php" method="post">
-                        <input type="hidden" name="order_id" value="1024">
-
-                        <select class="status-select" name="status">
-                            <option value="nieuw" selected>Nieuw</option>
-                            <option value="in-behandeling">In behandeling</option>
-                            <option value="onderweg">Onderweg</option>
-                            <option value="voltooid">Voltooid</option>
-                            <option value="geannuleerd">Geannuleerd</option>
-                        </select>
-
-                        <button type="submit">Opslaan</button>
-                    </form>
-                </dd>
-            </dl>
-
-        <a href="details.html" class="button">
-            Bekijk bestelling
-        </a>
-    </article>
-    <article class="order">
-        <header>
-            <h2>Bestelling #1024</h2>
-        </header>
-
-            <dl>
-                <dt>Datum</dt>
-                <dd>6 juni 2026</dd>
-
-                <dt>Klant</dt>
-                <dd>Jan Jansen</dd>
-
-                <dt>adres</dt>
-                <dd>Hoofdstraat 123, Druten</dd>
-
-                <dt>Totaal</dt>
-                <dd>€24,90</dd>
-
-                <dt>Status</dt>
-                <dd>
-                    <form action="update-status.php" method="post">
-                        <input type="hidden" name="order_id" value="1024">
-
-                        <select class="status-select" name="status">
-                            <option value="nieuw" selected>Nieuw</option>
-                            <option value="in-behandeling">In behandeling</option>
-                            <option value="onderweg">Onderweg</option>
-                            <option value="voltooid">Voltooid</option>
-                            <option value="geannuleerd">Geannuleerd</option>
-                        </select>
-
-                        <button type="submit">Opslaan</button>
-                    </form>
-                </dd>
-            </dl>
-
-        <a href="details.html" class="button">
-            Bekijk bestelling
-        </a>
-    </article>
+                <a href="details.php?id=<?= htmlspecialchars($order['order_id']) ?>">Bekijk bestelling</a>
+            </article>
+        <?php endforeach; ?>
+    <?php endif; ?>
 
 
   </section>

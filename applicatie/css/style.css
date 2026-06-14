@@ -144,6 +144,12 @@ aside ul li a:hover {
     border-radius: 0.5rem;
     cursor: pointer;
     margin-top: 0.5rem;
+
+    display: block;
+    box-sizing: border-box;
+    text-align: center;
+    text-decoration: none;
+    font: inherit;
 }
 
 .aside-button:hover {
@@ -165,6 +171,9 @@ section h2{
     margin: 1rem 0 1rem 0.5rem;
 }
 
+section.details {
+    margin: 1rem;
+}
 article.order, 
 section.details {
     display: flex;
@@ -174,10 +183,6 @@ section.details {
     padding: 1rem;
     border: 1px solid #ccc;
     border-radius: 8px;
-}
-
-section.details {
-    margin: 1rem;
 }
 
 article.order dl, 
@@ -289,7 +294,7 @@ button:hover {
     background-color: #a51f1f;
 }
 
-a:hover {
+main a:hover {
     color: purple;
 }
 
