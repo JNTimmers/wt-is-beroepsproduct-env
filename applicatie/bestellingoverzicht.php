@@ -12,7 +12,7 @@
 
     $startDate = $_GET['startdatum'] ?? '';
     $endDate = $_GET['einddatum'] ?? '';
-    $status = $_GET['status'] ?? '';
+    $status = $_GET['status'] ?? 'Open';
 
     $query = "
         SELECT 
@@ -40,7 +40,10 @@
         $params[] = $endDate;
     }
 
-    if ($status !== '') {
+    if ($status === 'Open') {
+        $query .= " AND po.status IN (1, 2, 3)";
+    }
+    elseif ($status !== 'All') {
         $query .= " AND po.status = ?";
         $params[] = $status;
     }
@@ -76,7 +79,8 @@
 
             <label for="status">Status</label>
             <select id="status" name="status">
-                <option value="">Alle statussen</option>
+                <option value="Open" <?= $status === 'Open' ? 'selected' : '' ?>>Open bestellingen</option>
+                <option value="All" <?= $status === 'All' ? 'selected' : '' ?>>Alle statussen</option>
                 <option value="1" <?= $status === '1' ? 'selected' : '' ?>>Nieuw</option>
                 <option value="2" <?= $status === '2' ? 'selected' : '' ?>>In behandeling</option>
                 <option value="3" <?= $status === '3' ? 'selected' : '' ?>>Onderweg</option>
