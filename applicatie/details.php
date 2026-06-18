@@ -1,7 +1,7 @@
 <?php 
-  require_once 'includes/session.php';
-  require_once 'database-connection.php';
-  require_once 'includes/functions.php';
+  require_once __DIR__ . '/includes/session.php';
+  require_once __DIR__ . '/includes/database-connection.php';
+  require_once __DIR__ . '/includes/functions.php';
 
   $db = maakverbinding();
 
@@ -9,7 +9,6 @@
       header('Location: index.php');
       exit;
   }
-
 
   $orderId = (int) $_GET['id'];
 

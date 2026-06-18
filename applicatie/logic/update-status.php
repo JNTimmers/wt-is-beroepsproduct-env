@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/session.php';
 require_once 'includes/functions.php';
-require_once 'database-connection.php';
+require_once 'includes/database-connection.php';
 
 if (!isPersonnel()) {
     header('Location: index.php');
