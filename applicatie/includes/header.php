@@ -31,7 +31,7 @@
         <div class="nav-actions">
           <a href="winkelmandje.php" class="nav-button">Winkelmandje</a>
           <?php if (isset($_SESSION['user'])): ?>
-            <a href="logout.php" class="nav-button">Logout</a>
+            <a href="logic/logout.php" class="nav-button">Logout</a>
           <?php else: ?>
             <a href="login.php" class="nav-button">Login</a>
           <?php endif; ?>

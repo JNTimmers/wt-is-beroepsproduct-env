@@ -1,4 +1,16 @@
 <?php
+
+function getStatuses(): array
+{
+    return [
+        1 => 'Nieuw',
+        2 => 'In behandeling',
+        3 => 'Onderweg',
+        4 => 'Voltooid',
+        5 => 'Geannuleerd'
+    ];
+}
+
 function addToBasket(string $productName, int $amount): void
 {
     if ($amount <= 0) {

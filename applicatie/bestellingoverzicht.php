@@ -66,7 +66,7 @@
 
                     <dt>Status</dt>
                     <dd>
-                        <form action="update-status.php" method="post">
+                        <form action="logic/update-status.php" method="post">
                             <input 
                                 type="hidden" 
                                 name="order_id" 

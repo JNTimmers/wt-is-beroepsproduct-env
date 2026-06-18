@@ -1,15 +1,15 @@
 <?php
-require_once 'includes/session.php';
-require_once 'includes/functions.php';
-require_once 'includes/database-connection.php';
+require_once __DIR__ . '/../includes/session.php';
+require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/database-connection.php';
 
 if (!isPersonnel()) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: bestellingsoverzicht.php');
+    header('Location: ../bestellingsoverzicht.php');
     exit;
 }
 
@@ -19,7 +19,7 @@ $status = $_POST['status'] ?? '';
 $allowedStatuses = ['1', '2', '3', '4', '5'];
 
 if ($orderId <= 0 || !in_array($status, $allowedStatuses, true)) {
-    header('Location: bestellingsoverzicht.php');
+    header('Location: ../bestellingoverzicht.php');
     exit;
 }
 
@@ -40,5 +40,5 @@ $stmt->execute([
     $orderId
 ]);
 
-header('Location: bestellingoverzicht.php');
+header('Location: ../bestellingoverzicht.php');
 exit;

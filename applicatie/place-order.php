@@ -1,5 +1,5 @@
 <?php
-require_once 'logic/place-order-logic.php';
+require_once __DIR__ . '/logic/place-order-logic.php';
 
 
 require 'includes/header.php';
